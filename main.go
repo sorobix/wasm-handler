@@ -14,6 +14,13 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
+	app.Get("/heartbeat", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status":           "Running",
+			"redis_connection": RedisConnected(),
+		})
+	})
+
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
 			c.Locals("allowed", true)

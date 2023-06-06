@@ -20,6 +20,14 @@ func InitialiseRedis() {
 	}
 }
 
+func RedisConnected() bool {
+	_, err := rdb.Ping().Result()
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func GetRedisClient() *redis.Client {
 	return rdb
 }

@@ -7,15 +7,9 @@ import (
 	"github.com/gofiber/contrib/websocket"
 )
 
-// key: md5 of base64 of entire code
-// value:
-// succ: bool
-// message: b64 of compiler output
-// wasm: b64 of wasm file content
-
 type RedisObject struct {
 	Success bool
-	Message string // base64 encoding of compiler output
+	Message string
 	Wasm    string
 }
 
