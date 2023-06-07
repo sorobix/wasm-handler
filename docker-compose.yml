@@ -8,9 +8,9 @@ services:
 
   go-app:
     image: wasm-handler
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       - WS_PORT=3001
       - REDIS_HOST=redis:6379
