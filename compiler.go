@@ -97,7 +97,8 @@ func compilerController() func(c *websocket.Conn) {
 				continue
 			}
 
-			if err := c.WriteMessage(mt, responseInJson); err != nil {
+			base64EncodedResponse := base64Encoder(string(responseInJson))
+			if err := c.WriteMessage(mt, []byte(base64EncodedResponse)); err != nil {
 				logAndSendCompileErrorToClient(c, mt, redisKey, "Compile controller :: Error in writing back to the clients:", err)
 				continue
 			}

@@ -13,6 +13,19 @@ func ParseInputMessageAsProjectDirectory(message []byte) (InputProjectDir, error
 	if err != nil {
 		return projDir, err
 	}
+
+	decodedCargoToml, err := base64Decoder(projDir.CargoToml)
+	if err != nil {
+		return projDir, err
+	}
+	projDir.CargoToml = string(decodedCargoToml)
+
+	decodedMainRs, err := base64Decoder(projDir.MainRs)
+	if err != nil {
+		return projDir, err
+	}
+	projDir.MainRs = string(decodedMainRs)
+
 	return projDir, nil
 }
 

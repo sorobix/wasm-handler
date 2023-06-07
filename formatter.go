@@ -46,7 +46,8 @@ func fileFormatterController() func(c *websocket.Conn) {
 				continue
 			}
 
-			if err = c.WriteMessage(mt, responseJSON); err != nil {
+			base64EncodedResponse := base64Encoder(string(responseJSON))
+			if err = c.WriteMessage(mt, []byte(base64EncodedResponse)); err != nil {
 				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in writing back to the client:", err)
 				continue
 			}
