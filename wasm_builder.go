@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -68,15 +67,11 @@ func BuildWasmFromMainRS(cargoToml string, mainRSContent string) RedisObject {
 		return result
 	}
 
-	jsonEncodedWasmFile, err := json.Marshal(wasmData)
-	if err != nil {
-		result.Message = base64Encoder(fmt.Sprintf("failed to marshal json: %v", err))
-		return result
-	}
+	b64EncodedWasmFile := base64Encoder(string(wasmData))
 
 	result.Success = true
 	result.Message = base64Encoder("Compilation successful!")
-	result.Wasm = string(jsonEncodedWasmFile)
+	result.Wasm = b64EncodedWasmFile
 
 	return result
 }
