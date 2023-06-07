@@ -13,6 +13,8 @@ func BuildWasmFromMainRS(cargoToml string, mainRSContent string) RedisObject {
 		Success: false,
 	}
 
+	projectName := fetchProjectName(cargoToml)
+
 	tmpDir, err := os.MkdirTemp("", "rust-project")
 	if err != nil {
 		result.Message = base64Encoder(fmt.Sprintf("failed to create temporary directory: %v", err))
@@ -25,7 +27,7 @@ func BuildWasmFromMainRS(cargoToml string, mainRSContent string) RedisObject {
 		return result
 	}
 
-	projectDir := filepath.Join(tmpDir, "sorobix_temp")
+	projectDir := filepath.Join(tmpDir, projectName)
 
 	if err := exec.Command("cargo", "new", "--lib", projectDir).Run(); err != nil {
 		result.Message = base64Encoder(fmt.Sprintf("failed to create rust project: %v", err))
@@ -55,7 +57,7 @@ func BuildWasmFromMainRS(cargoToml string, mainRSContent string) RedisObject {
 		return result
 	}
 
-	wasmFilePath := filepath.Join(projectDir, "target", "wasm32-unknown-unknown", "release", "sorobix_temp.wasm")
+	wasmFilePath := filepath.Join(projectDir, "target", "wasm32-unknown-unknown", "release", projectName+".wasm")
 	if _, err := os.Stat(wasmFilePath); os.IsNotExist(err) {
 		result.Message = base64Encoder(fmt.Sprintf("wasm file does not exist: %v", err))
 		return result
@@ -74,4 +76,20 @@ func BuildWasmFromMainRS(cargoToml string, mainRSContent string) RedisObject {
 	result.Wasm = b64EncodedWasmFile
 
 	return result
+}
+
+func fetchProjectName(file string) string {
+	lines := strings.Split(file, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "name") {
+			parts := strings.Split(line, "=")
+			if len(parts) == 2 {
+				projectName := strings.TrimSpace(parts[1])
+				projectName = strings.Trim(projectName, `'"`)
+				return projectName
+			}
+		}
+	}
+	return "sorobix_temp"
 }
