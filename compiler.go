@@ -102,7 +102,7 @@ func compilerController() func(c *websocket.Conn) {
 				logAndSendCompileErrorToClient(c, mt, redisKey, "Compile controller :: Error in writing back to the clients:", err)
 				continue
 			}
-			log.Println(c.RemoteAddr(), "Sent format response!")
+			log.Println(c.RemoteAddr(), "Sent compile response!")
 		}
 	}
 }
