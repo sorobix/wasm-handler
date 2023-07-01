@@ -5,9 +5,14 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
 func runFormatter(inputCode string) ([]byte, error) {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	cmd := exec.Command("rustfmt")
 	cmd.Stdin = strings.NewReader(inputCode)
 	var stdOut bytes.Buffer
