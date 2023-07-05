@@ -15,8 +15,16 @@ type FormatResponse struct {
 func fileFormatterController() func(c *websocket.Conn) {
 	return func(c *websocket.Conn) {
 		log.Println(c.RemoteAddr(), "Connection opened for format request!")
+		c.SetCloseHandler(func(code int, text string) error {
+			log.Printf("WebSocket connection for format closed with code %d and text: %s", code, text)
+			return nil
+		})
 		for {
 			mt, msg, err := c.ReadMessage()
+			if mt == websocket.CloseMessage|websocket.CloseGoingAway|websocket.CloseAbnormalClosure {
+				log.Println(c.RemoteAddr(), "Closing formatter websocket")
+				return
+			}
 			log.Println(c.RemoteAddr(), "Received format request!")
 
 			if err != nil {
