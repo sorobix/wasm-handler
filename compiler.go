@@ -30,7 +30,7 @@ func compilerController() func(c *websocket.Conn) {
 		for {
 			mt, msg, err := c.ReadMessage()
 			if err != nil {
-				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in Reading message from websocket:", err)
+				logAndSendFormatErrorToClient(c, mt, "Compile controller :: Error in Reading message from websocket:", err)
 				return
 			}
 			log.Println(c.RemoteAddr(), "Received compile request!")

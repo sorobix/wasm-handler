@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func runFormatter(inputCode string) ([]byte, error) {
-	cmd := exec.CommandContext(context.Background(), "rustfmt")
+func runFormatter(inputCode string, ctx context.Context) ([]byte, error) {
+	cmd := exec.CommandContext(ctx, "rustfmt")
 	cmd.Stdin = strings.NewReader(inputCode)
 	var stdOut bytes.Buffer
 	cmd.Stdout = &stdOut
