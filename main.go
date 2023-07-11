@@ -14,23 +14,23 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
-	app.Use("/ws", func(c *fiber.Ctx) error {
+	handler := app.Group("/handler")
+	handler.Get("/heartbeat", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status":           "Running",
+			"redis_connection": RedisConnected(),
+		})
+	})
+	handler.Get("/format", FileFormatterRest())
+
+	ws := handler.Group("/ws")
+	ws.Use("/", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
 			c.Locals("allowed", true)
 			return c.Next()
 		}
 		return fiber.ErrUpgradeRequired
 	})
-
-	ws := app.Group("/ws")
-	ws.Get("/heartbeat", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"status":           "Running",
-			"redis_connection": RedisConnected(),
-		})
-	})
-
-	ws.Get("/format", websocket.New(fileFormatterController()))
 	ws.Get("/compile", websocket.New(compilerController()))
 
 	app.Listen(":" + wsPort)
