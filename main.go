@@ -21,7 +21,7 @@ func main() {
 			"redis_connection": RedisConnected(),
 		})
 	})
-	handler.Get("/format", FileFormatterRest())
+	handler.Post("/format", FileFormatterRest())
 
 	ws := handler.Group("/ws")
 	ws.Use("/", func(c *fiber.Ctx) error {
