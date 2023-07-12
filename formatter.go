@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 
@@ -38,7 +39,7 @@ func fileFormatterController() func(c *websocket.Conn) {
 				continue
 			}
 
-			result, err := runFormatter(string(input))
+			result, err := runFormatter(string(input), context.Background())
 			if err != nil {
 				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in formatting input code:", err)
 				continue
