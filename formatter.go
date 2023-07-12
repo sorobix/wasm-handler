@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 
@@ -13,57 +12,57 @@ type FormatResponse struct {
 	Data    string
 }
 
-func fileFormatterController() func(c *websocket.Conn) {
-	return func(c *websocket.Conn) {
-		log.Println(c.RemoteAddr(), "Connection opened for format request!")
-		c.SetCloseHandler(func(code int, text string) error {
-			log.Printf("WebSocket connection for format closed with code %d and text: %s", code, text)
-			return nil
-		})
-		for {
-			mt, msg, err := c.ReadMessage()
-			if mt == websocket.CloseMessage|websocket.CloseGoingAway|websocket.CloseAbnormalClosure {
-				log.Println(c.RemoteAddr(), "Closing formatter websocket")
-				return
-			}
-			log.Println(c.RemoteAddr(), "Received format request!")
-
-			if err != nil {
-				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in Reading message from websocket:", err)
-				return
-			}
-
-			input, err := base64Decoder(string(msg))
-			if err != nil {
-				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in decoding input base64 code:", err)
-				continue
-			}
-
-			result, err := runFormatter(string(input), context.Background())
-			if err != nil {
-				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in formatting input code:", err)
-				continue
-			}
-
-			response := FormatResponse{
-				Success: true,
-				Data:    base64Encoder(string(result)),
-			}
-			responseJSON, err := json.Marshal(response)
-			if err != nil {
-				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in marshaling response:", err)
-				continue
-			}
-
-			base64EncodedResponse := base64Encoder(string(responseJSON))
-			if err = c.WriteMessage(mt, []byte(base64EncodedResponse)); err != nil {
-				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in writing back to the client:", err)
-				continue
-			}
-			log.Println(c.RemoteAddr(), "Sent format response!")
-		}
-	}
-}
+//func fileFormatterController() func(c *websocket.Conn) {
+//	return func(c *websocket.Conn) {
+//		log.Println(c.RemoteAddr(), "Connection opened for format request!")
+//		c.SetCloseHandler(func(code int, text string) error {
+//			log.Printf("WebSocket connection for format closed with code %d and text: %s", code, text)
+//			return nil
+//		})
+//		for {
+//			mt, msg, err := c.ReadMessage()
+//			if mt == websocket.CloseMessage|websocket.CloseGoingAway|websocket.CloseAbnormalClosure {
+//				log.Println(c.RemoteAddr(), "Closing formatter websocket")
+//				return
+//			}
+//			log.Println(c.RemoteAddr(), "Received format request!")
+//
+//			if err != nil {
+//				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in Reading message from websocket:", err)
+//				return
+//			}
+//
+//			input, err := base64Decoder(string(msg))
+//			if err != nil {
+//				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in decoding input base64 code:", err)
+//				continue
+//			}
+//
+//			result, err := runFormatter(string(input), context.Background())
+//			if err != nil {
+//				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in formatting input code:", err)
+//				continue
+//			}
+//
+//			response := FormatResponse{
+//				Success: true,
+//				Data:    base64Encoder(string(result)),
+//			}
+//			responseJSON, err := json.Marshal(response)
+//			if err != nil {
+//				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in marshaling response:", err)
+//				continue
+//			}
+//
+//			base64EncodedResponse := base64Encoder(string(responseJSON))
+//			if err = c.WriteMessage(mt, []byte(base64EncodedResponse)); err != nil {
+//				logAndSendFormatErrorToClient(c, mt, "Format controller :: Error in writing back to the client:", err)
+//				continue
+//			}
+//			log.Println(c.RemoteAddr(), "Sent format response!")
+//		}
+//	}
+//}
 
 func logAndSendFormatErrorToClient(c *websocket.Conn, mt int, appErrorMessage string, sysError error) {
 	response := FormatResponse{

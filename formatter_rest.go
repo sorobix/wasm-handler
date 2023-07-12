@@ -28,8 +28,12 @@ func FileFormatterRest() fiber.Handler {
 				"error":   "bad base64 input",
 			})
 		}
-		result, err := runFormatter(string(input), c.Context())
-		if err != nil {
+		ch := make(chan string)
+		go func() {
+			runFormatter(string(input), ch)
+		}()
+		res := <-ch
+		if res == "" {
 			c.Status(http.StatusNotAcceptable)
 			return c.JSON(fiber.Map{
 				"success": false,
@@ -39,7 +43,7 @@ func FileFormatterRest() fiber.Handler {
 		}
 		return c.JSON(fiber.Map{
 			"success": true,
-			"data":    base64Encoder(string(result)),
+			"data":    base64Encoder(string(res)),
 		})
 	}
 }
