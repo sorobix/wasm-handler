@@ -13,7 +13,7 @@ var wsPort = ""
 var redisHost = ""
 var redisPassword = ""
 var redisDb = 0
-var redisKeyLifetime = time.Hour
+var redisKeyLifetime = time.Hour * 24
 
 func init() {
 	err := godotenv.Load(".env")
