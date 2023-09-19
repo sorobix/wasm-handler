@@ -6,7 +6,7 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
-FROM rust:latest
+FROM rust:1.72
 RUN rustup target add wasm32-unknown-unknown
 RUN rustup component add rustfmt
 RUN curl -LJO https://github.com/mozilla/sccache/releases/download/v0.4.1/sccache-v0.4.1-x86_64-unknown-linux-musl.tar.gz
